@@ -1,0 +1,30 @@
+	Standalone ECW 3.3 Drivers for GDAL
+	===================================
+
+This package contains standalone drivers for ECW raster files that      
+can be built after GDAL has been built and installed as an "autoload"   
+driver.                                                                 
+
+The purpose of this code is allowing a separate building of the ECW
+driver which is problematic for implied EULA. Note that in order to use
+GDAL (and GDAL-based third parties product) along with Ermapper ECW SDK
+you need to read, understand and approve the Ermapper EULA which can be
+retrieved on the Ermapper site.
+
+To build this driver it is necessary for it to find GDAL and ECW support
+files. Typically the configure and build process would look something
+like:
+
+./configure --with-gdal=/usr/local/bin/gdal-config --with-ecw=/usr/local/ecw3.3
+make
+sudo make install
+
+The ecw3.3 directory will contain the required includes and libraries as
+compiled starting from the source Ermapper SDK.
+
+See also:
+
+  http://www.gdal.org/
+  http://www.ermapper.com/
+  http://ermapper.com/Downloads.aspx?v=315
+

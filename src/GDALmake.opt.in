@@ -1,0 +1,133 @@
+GDAL_ROOT	=	@GDAL_ROOT@
+top_builddir	=	$(GDAL_ROOT)
+
+AUTOLOAD_DIR	=	@AUTOLOAD_DIR@
+
+EXTRA_LIBS  =   @EXTRA_LIBS@
+#
+# the library can be built by the native build or with the help of libtool
+#
+
+SHELL    =   @SHELL@
+HAVE_LIBTOOL	=	@HAVE_LIBTOOL@
+LIBTOOL	=	@LIBTOOL@
+ifeq ($(HAVE_LIBTOOL),yes)
+LIBTOOL_COMPILE_CC =	$(LIBTOOL) --mode=compile --tag=CC
+LIBTOOL_COMPILE_CXX =	$(LIBTOOL) --mode=compile --tag=CXX
+LIBTOOL_LINK	=	$(LIBTOOL) --mode=link
+LIBTOOL_INSTALL	=	$(LIBTOOL) --mode=install 
+LIBTOOL_FINISH	=	$(LIBTOOL) --mode=finish --silent
+LIBTOOL_CLEAN	=	$(LIBTOOL) --mode=clean
+OBJ_EXT = lo
+else
+LIBTOOL_FINISH	=	@BINTRUE@
+OBJ_EXT = o
+endif
+
+CC	=	$(LIBTOOL_COMPILE_CC) @CC@
+CXX	=	$(LIBTOOL_COMPILE_CXX) @CXX@
+LD	=	$(LIBTOOL_LINK)	@CXX@
+RM	=	$(LIBTOOL_CLEAN) /bin/rm -f *.lo
+INSTALL = 	$(LIBTOOL_INSTALL) $(GDAL_ROOT)/install-sh -c
+INSTALL_LIB 	=	$(LIBTOOL_INSTALL) $(GDAL_ROOT)/install-sh -c
+INSTALL_DATA	= 	$(GDAL_ROOT)/install-sh -c -m 0644
+INSTALL_DIR	= 	$(GDAL_ROOT)/install-sh -d
+
+# SDE_LIB needs to be first because it embeds zlib.  We need to use its symbols instead of -lz's
+
+LIBS	=	$(SDE_LIB) @LIBS@ $(KAK_LIBS) $(DWG_LIBS) $(CURL_LIB) \
+		$(MRSID_LIBS) $(MRSID_LIDAR_LIBS) $(ECW_LIBS) $(INGRES_LIB) \
+		$(PCIDSK_LIB) $(RASDAMAN_LIB) $(CHARLS_LIB) $(SOSI_LIB) \
+		$(OPENCL_LIB) $(JVM_LIB) $(LIBICONV) $(FGDB_LIB) $(LIBXML2_LIB)
+
+PYTHON = @PYTHON@
+PY_HAVE_SETUPTOOLS=@PY_HAVE_SETUPTOOLS@
+
+# Next Generation SWIG bindings
+BINDINGS	=	@BINDINGS@
+
+HAVE_OGDI = @HAVE_OGDI@
+OGR_ENABLED = @OGR_ENABLED@
+
+OSX_FRAMEWORK_PREFIX = /Library/Frameworks/GDAL.framework
+OSX_VERSION_FRAMEWORK_PREFIX = ${OSX_FRAMEWORK_PREFIX}/Versions/@GDAL_VERSION_MAJOR@.@GDAL_VERSION_MINOR@
+
+prefix		=	@prefix@
+exec_prefix	=	@exec_prefix@
+INST_PREFIX	=	@exec_prefix@
+INST_INCLUDE	=	@includedir@
+INST_DATA 	=	@datadir@
+INST_LIB	=	@libdir@
+INST_BIN	=	@bindir@
+INST_PYMOD      =       @pymoddir@
+INST_DOCS	=	@exec_prefix@/doc
+INST_MAN	=	@mandir@
+INST_HTML	=	$(HOME)/www/gdal
+
+CPPFLAGS	= @CPPFLAGS@ -I$(GDAL_ROOT)
+CFLAGS		= @CFLAGS@ @C_WFLAGS@ $(USER_DEFS)
+CXXFLAGS	= @CXXFLAGS@ @CXX_WFLAGS@ $(USER_DEFS)
+LDFLAGS     = @LDFLAGS@
+
+RANLIB		=	@RANLIB@
+SO_EXT		=	@SO_EXT@
+LD_SHARED	=	@LD_SHARED@
+EXE		=       @EXE_EXT@
+
+ifeq ($(notdir $(LD_SHARED)),true)
+HAVE_LD_SHARED  =	no
+else
+HAVE_LD_SHARED  =	yes
+endif
+
+GDAL_INCLUDE	=	$(GDAL_ROOT)
+
+# libtool targets and help variables
+LIBGDAL	:=		libgdal.la
+LIBGDAL_CURRENT	:=	18
+LIBGDAL_REVISION	:=	0
+LIBGDAL_AGE	:=	17
+
+# native build targets and variables
+GDAL_VER	=	@GDAL_VER@
+
+# version info
+GDAL_VERSION_MAJOR =    @GDAL_VERSION_MAJOR@
+GDAL_VERSION_MINOR =    @GDAL_VERSION_MINOR@
+GDAL_VERSION_REV   =    @GDAL_VERSION_REV@
+
+GDAL_LIB	= 	$(GDAL_ROOT)/libgdal.a
+GDAL_SLIB	=	$(GDAL_ROOT)/libgdal.$(SO_EXT)
+GDAL_SLIB_LINK	=	-L$(GDAL_ROOT) -lgdal
+
+# 
+# ECW Related
+# 
+ECW_FLAGS	= @ECW_FLAGS@
+ECW_INCLUDE 	= @ECW_INCLUDE@
+ECW_LIBS	= @ECW_LIBS@
+
+
+O_OBJ =	$(foreach file,$(OBJ),../o/$(file))
+
+../o/%.$(OBJ_EXT):	%.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
+
+../o/%.$(OBJ_EXT):	%.cpp
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c -o $@ $<
+
+%.$(OBJ_EXT):	%.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
+
+%.$(OBJ_EXT):	%.cpp
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c -o $@ $<
+
+#
+# default rules for handling subdirectories
+#
+
+%-target:
+	$(MAKE) -C $*
+
+%-clean:
+	$(MAKE) -C $* clean

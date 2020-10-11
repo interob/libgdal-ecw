@@ -1,0 +1,333 @@
+dnl ***************************************************************************
+dnl $Id$
+dnl
+dnl Project:  GDAL
+dnl Purpose:  Configure source file.
+dnl Author:   Frank Warmerdam, warmerdam@pobox.com
+dnl
+dnl ***************************************************************************
+dnl Copyright (c) 2000, Frank Warmerdam
+dnl
+dnl Permission is hereby granted, free of charge, to any person obtaining a
+dnl copy of this software and associated documentation files (the "Software"),
+dnl to deal in the Software without restriction, including without limitation
+dnl the rights to use, copy, modify, merge, publish, distribute, sublicense,
+dnl and/or sell copies of the Software, and to permit persons to whom the
+dnl Software is furnished to do so, subject to the following conditions:
+dnl
+dnl The above copyright notice and this permission notice shall be included
+dnl in all copies or substantial portions of the Software.
+dnl
+dnl THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+dnl OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+dnl FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+dnl THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+dnl LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+dnl FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+dnl DEALINGS IN THE SOFTWARE.
+dnl ***************************************************************************
+
+dnl Disable configure caching ... it causes lots of hassles.
+define([AC_CACHE_LOAD], )
+define([AC_CACHE_SAVE], )
+
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(GDALmake.opt.in)
+AC_CONFIG_MACRO_DIR(m4)
+#AC_CONFIG_HEADERS([port/cpl_config.h:port/cpl_config.h.in])
+#AH_BOTTOM([#include "cpl_config_extras.h"])
+
+dnl We require autoconf 2.52+ for libtool support on cygwin/mingw hosts
+AC_PREREQ(2.52)
+
+dnl Compute the canonical host-system (the system we are building for)
+dnl type variable $host
+AC_CANONICAL_HOST
+
+dnl Enable as much warnings as possible
+AX_CFLAGS_WARN_ALL(C_WFLAGS)
+AX_CXXFLAGS_WARN_ALL(CXX_WFLAGS)
+AC_SUBST(CXX_WFLAGS,$CXX_WFLAGS)
+AC_SUBST(C_WFLAGS,$C_WFLAGS)
+
+dnl Checks for programs.
+AC_PROG_CC
+AC_PROG_CXX
+AC_LIBTOOL_WIN32_DLL
+AC_PROG_LIBTOOL
+
+AC_PROG_RANLIB
+
+dnl AC_COMPILER_PIC as expanded by autoconf-2.68 doesn't work for the C++ part with clang++ 3.0 that doesn't like compiling .c programs
+dnl so we inline the expanded code and fix it at hand.
+dnl AC_COMPILER_PIC
+	echo 'void f(){}' > conftest.c
+	if test -z "`${CC-cc} $CFLAGS -fPIC -c conftest.c 2>&1`"; then
+	  CFLAGS="$CFLAGS -fPIC"
+	fi
+	echo 'void f(){}' > conftest.cpp
+	if test -z "`${CXX-g++} $CXXFLAGS -fPIC -c conftest.cpp 2>&1`"; then
+	  CXXFLAGS="$CXXFLAGS -fPIC"
+	fi
+	rm -f conftest*
+
+AC_LD_SHARED
+
+dnl Checks for libraries.
+AC_CHECK_LIB(dl,dlopen,,,)
+
+dnl Needed on Solaris. 
+AC_CHECK_LIB(rt,nanosleep,,,)
+
+dnl We don't need to add math library to all targets
+case "${host_os}" in
+    cygwin* | mingw32* | pw32* | beos* | darwin*)
+        ;;
+    *)
+	AC_CHECK_LIB(m,sin,,,)
+        ;;
+esac
+
+dnl Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS(assert.h fcntl.h unistd.h dbmalloc.h dlfcn.h stdint.h limits.h locale.h values.h float.h errno.h direct.h)
+
+AC_C_BIGENDIAN
+
+dnl Check for 64 bit file API
+AC_HAVE_LONG_LONG
+AC_UNIX_STDIO_64
+
+AC_CHECK_SIZEOF(int)
+AC_CHECK_SIZEOF(unsigned long)
+AC_CHECK_SIZEOF(void*)
+dnl Some compilers (IBM VisualAge) has these types defined, so check it here.
+dnl These types are used in internal libtiff.
+AC_CHECK_TYPES([int8, int16, int32],,,
+[
+#if HAVE_INTTYPES_H
+# include <inttypes.h>
+#endif
+])
+
+dnl We need the following lines for libtiff too.
+HAVE_IEEEFP=1
+AC_DEFINE_UNQUOTED(HAVE_IEEEFP, $HAVE_IEEEFP, [Define as 0 or 1 according to the floating point format suported by the machine])
+
+dnl Check the native cpu bit order (also libtiff stuff).
+AC_MSG_CHECKING([native cpu bit order])
+case "$host_cpu" in
+    i*86*|x86_64*)
+        HOST_FILLORDER=FILLORDER_LSB2MSB
+	AC_MSG_RESULT([lsb2msb])
+	;;
+    *)
+	HOST_FILLORDER=FILLORDER_MSB2LSB
+	AC_MSG_RESULT([msb2lsb])
+        ;;
+esac
+AC_DEFINE_UNQUOTED(HOST_FILLORDER, $HOST_FILLORDER, [Set the native cpu bit order (FILLORDER_LSB2MSB or FILLORDER_MSB2LSB)])
+
+dnl Checks for library functions.
+AC_FUNC_VPRINTF
+AC_CHECK_FUNCS(snprintf vsnprintf)
+AC_CHECK_FUNCS(atoll)
+AC_CHECK_FUNCS(strtof)
+AC_CHECK_FUNCS(getcwd)
+
+dnl Check for declarations
+AC_CHECK_DECLS(strtof)
+
+AC_CHECK_FUNCS(readlink)
+AC_CHECK_FUNCS(lstat)
+AC_CHECK_FUNCS(posix_spawnp)
+AC_CHECK_FUNCS(vfork)
+
+dnl Make sure at least these are checked under C++.  Prototypes missing on 
+dnl some platforms.
+
+AC_LANG_PUSH(C++)
+AC_CHECK_FUNC_CUSTOM(gmtime_r,[#include <time.h>],[time_t t; struct tm ltime; t = time(0); gmtime_r( &t, &ltime );])
+AC_CHECK_FUNC_CUSTOM(localtime_r,[#include <time.h>],[time_t t; struct tm ltime; t = time(0); localtime_r( &t, &ltime );])
+AC_LANG_POP(C++)
+
+AC_CHECK_FUNC(setlocale)
+
+OPT_GDAL_FORMATS=
+EXTRA_INCLUDES=
+
+dnl ---------------------------------------------------------------------------
+dnl Check if GCC 4.1 atomic builtins are really available
+dnl (some GCC versions are broken w.r.t this on some exotic architectures...)
+dnl ---------------------------------------------------------------------------
+
+AC_MSG_CHECKING([whether GCC 4.1 atomic builtins are available])
+
+rm -f atomicbuiltins.c
+echo 'int main(int argc, char* argv[]) { int i; __sync_add_and_fetch(&i, 1); __sync_sub_and_fetch(&i, 1); return 0; } ' > atomicbuiltins.c
+if test -z "`${CC} atomicbuiltins.c -o atomicbuiltins 2>&1`" ; then
+    HAVE_GCC_ATOMIC_BUILTINS=yes
+    AC_MSG_RESULT([yes])
+    AC_DEFINE_UNQUOTED(HAVE_GCC_ATOMIC_BUILTINS,1, [Define to 1 if GCC atomic builtins are available])
+else
+    HAVE_GCC_ATOMIC_BUILTINS=no
+    AC_MSG_RESULT([no])
+fi
+rm -f atomicbuiltins.* atomicbuiltins
+
+AC_SUBST(HAVE_GCC_ATOMIC_BUILTINS,$HAVE_GCC_ATOMIC_BUILTINS)
+
+dnl ---------------------------------------------------------------------------
+dnl Find GDAL
+dnl ---------------------------------------------------------------------------
+
+AC_ARG_WITH(gdal,
+[  --with-gdal[=PATH]        GDAL (PATH is path to gdal-config)],,)
+
+if test "$with_gdal" = "yes" -o "$with_gdal" = "" ; then
+
+  if test "`basename xx/$with_gdal`" = "gdal-config" ; then
+    GDAL_CONFIG="$with_gdal"
+  fi
+
+  if test -z "$GDAL_CONFIG" ; then
+    AC_PATH_PROG(GDAL_CONFIG, gdal-config, no)
+  fi
+
+  if test "$GDAL_CONFIG" = "no" ; then
+    AC_MSG_ERROR([couldn't find gdal-config])
+  fi
+
+elif test -n "$with_gdal" -a "$with_gdal" != "no" ; then
+
+  GDAL_CONFIG=$with_gdal
+
+  if test -f "$GDAL_CONFIG" -a -x "$GDAL_CONFIG" ; then
+    AC_MSG_RESULT([user supplied gdal-config ($GDAL_CONFIG)])
+  else
+    AC_MSG_ERROR(['$GDAL_CONFIG' is not an executable.  Make sure you use --with-gdal=/path/to/gdal-config])
+  fi
+
+else
+
+  AC_MSG_ERROR([gdal required to build GDAL ECW 3.3 driver])
+
+fi
+
+LIBS="`$GDAL_CONFIG --libs` $LIBS"
+GDAL_INC=`$GDAL_CONFIG --cflags`
+
+AC_SUBST(GDAL_ROOT,    $GDAL_INC)
+
+dnl ---------------------------------------------------------------------------
+dnl Where to put driver?
+dnl ---------------------------------------------------------------------------
+AC_ARG_WITH(autoload,[  --with-autoload[=DIR]      Directory for autoload drivers],,)
+
+if test "$with_autoload" != "" ; then
+  AUTOLOAD_DIR=$with_autoload
+else
+  if $GDAL_CONFIG --autoload > /dev/null 2>&1 ; then
+    AUTOLOAD_DIR=`$GDAL_CONFIG --autoload`
+  else
+    AUTOLOAD_DIR=`$GDAL_CONFIG --prefix`/lib/gdalplugins
+  fi
+fi
+
+AC_MSG_RESULT(using $AUTOLOAD_DIR as GDAL shared library autoload directory)
+AC_SUBST(AUTOLOAD_DIR,$AUTOLOAD_DIR)
+
+dnl ---------------------------------------------------------------------------
+dnl Select a ECW Library to use, or disable driver.
+dnl ---------------------------------------------------------------------------
+ECW_FLAGS=
+ECW_LIBS=
+ECW_INCLUDE=
+
+AC_ARG_WITH(ecw,[  --with-ecw[=ARG]        Include ECW support (ARG=ECW SDK Path, yes or no)],,)
+
+if test ! -z "`uname | grep Darwin`" ; then
+  CARBON_FRAMEWORK="-framework Carbon"
+else
+  CARBON_FRAMEWORK=
+fi
+
+if test "$with_ecw" = "no" ; then
+
+  ECW_SETTING=no
+
+  echo "ECW support disabled."
+
+elif test "$with_ecw" = "yes" -o "$with_ecw" = "" ; then
+
+  AC_CHECK_LIB(NCSEcw,NCScbmOpenFileView,ECW_SETTING=yes,ECW_SETTING=no,-lNCSCnet -lNCSUtil)
+
+  if test "$ECW_SETTING" = "yes" ; then   
+    ECW_LIBS="-lNCSEcw -lNCSEcwC -lNCSCnet -lNCSUtil"
+  fi
+
+  if test "$ECW_SETTING" = "no" ; then
+    AC_CHECK_LIB(ecwj2,NCScbmOpenFileView,ECW_SETTING=yes,ECW_SETTING=no,$CARBON_FRAMEWORK)
+    if test "$ECW_SETTING" = "yes" ; then   
+      ECW_LIBS="-lecwj2 $CARBON_FRAMEWORK"
+    fi
+  fi
+
+else
+
+  AC_MSG_CHECKING([for libNCSEcw.so or libecwj2])
+  ECW_SETTING=yes
+  if test -r $with_ecw/lib/libNCSCnet.so -o -r $with_ecw/lib/libNCSCnet.dylib ; then
+    ECW_LIBS="-L$with_ecw/lib -lNCSEcw -lNCSEcwC -lNCSCnet -lNCSUtil"
+    AC_MSG_RESULT([found in $with_ecw/lib.])
+  elif test -r $with_ecw/lib/libNCSCNet.so -o -r $with_ecw/lib/libNCSCNet.dylib ; then
+    ECW_LIBS="-L$with_ecw/lib -lNCSEcw -lNCSEcwC -lNCSCNet -lNCSUtil"
+    AC_MSG_RESULT([found in $with_ecw/lib.])
+  elif test -r $with_ecw/bin/libNCSEcw.so -o -r $with_ecw/bin/libNCSEcw.dylib ; then
+    ECW_LIBS="-L$with_ecw/bin -lNCSEcw -lNCSEcwC -lNCSCnet -lNCSUtil"
+    AC_MSG_RESULT([found in $with_ecw/bin.])
+  elif test -r $with_ecw/lib/libecwj2.dylib ; then
+    ECW_LIBS="-L$with_ecw/lib -lecwj2 $CARBON_FRAMEWORK"
+    AC_MSG_RESULT([found libecwj2 in $with_ecw/lib.])
+
+  # ECW SDK 5.0 style
+  elif test -r $with_ecw/lib/x64/release/libNCSEcw.so ; then
+    if test `arch` == "x86_64" ; then
+      ECW_LIBDIR=$with_ecw/lib/x64/release
+    else
+      ECW_LIBDIR=$with_ecw/lib/x86/release
+    fi
+    ECW_FLAGS="-DLINUX -DX86 -DPOSIX -DHAVE_COMPRESS -DECW_COMPRESS_RW_SDK_VERSION"
+    ECW_LIBS="-L$ECW_LIBDIR -lNCSEcw"
+    AC_MSG_RESULT([found Intergraph 5.x+ SDK in ${ECW_LIBDIR}.])
+  else
+    AC_MSG_ERROR([not found in $with_ecw/lib or $with_ecw/bin.])
+  fi
+
+  AC_MSG_CHECKING([for NCSECWClient.h in $with_ecw/include])
+  if test -r $with_ecw/include/NCSECWClient.h ; then  
+    AC_MSG_RESULT([found.])
+    ECW_INCLUDE="-I$with_ecw/include"
+  else
+    AC_MSG_ERROR([not found.])
+  fi
+  AC_MSG_CHECKING([for ECWJP2BuildNumber.h in $with_ecw/include])
+  if test -r $with_ecw/include/ECWJP2BuildNumber.h ; then  
+    AC_MSG_RESULT([found.])
+    ECW_FLAGS="-DHAVE_ECW_BUILDNUMBER_H $ECW_FLAGS"
+  else
+    AC_MSG_RESULT([not found.])
+  fi
+fi
+
+AC_SUBST(ECW_SETTING,$ECW_SETTING)
+AC_SUBST(EXTRA_LIBS,$ECW_LIBS)
+AC_SUBST(ECW_FLAGS,$ECW_FLAGS)
+AC_SUBST(ECW_INCLUDE,$ECW_INCLUDE)
+
+if test "$ECW_SETTING" != "no" ; then
+  OPT_GDAL_FORMATS="ecw $OPT_GDAL_FORMATS"
+fi
+
+
+AC_OUTPUT(GDALmake.opt)
