@@ -30,7 +30,8 @@ With slight adaptation, SDK 5.5 should work fine too.
 
 # Source
 Files in src/ were taken from the .DEB: https://launchpad.net/~ubuntugis/+archive/ubuntugis-unstable/+files/libgdal-ecw-src_1.10.0-1~precise4_all.deb (uploaded by Jerome Villeneuve Larouche, 2013-08-21)
-Then, the following .CPP and .H files were updated from the official GDAL Github, master branch 2020-10-10:
+
+Then, the following .CPP and .H files were updated from the official GDAL Github, master branch (2020-10-10; https://github.com/OSGeo/gdal/tree/master/gdal/frmts/ecw):
 - ecwasyncreader.cpp
 - ecwcreatecopy.cpp
 - ecwdataset.cpp
