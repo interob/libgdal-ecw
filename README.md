@@ -2,9 +2,9 @@
 
 Information on how to get ECW working with GDAL is all over the place. This resource aims to provide you with concise instructions to get ECW going through a simple GDAL plugin rather than compiling the entire GDAL library from source --with-ecw.
 
-#Intructions
+# Intructions
 
-##Ubuntu 20.04
+## Ubuntu 20.04
 1. Install GDAL; the below outlined procedure worked well with GDAL 3.1.3 installed from UbuntuGIS-unstable PPA (`sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable`)
 2. Download the ERDAS ECW SDK; this guide is based on 5.4 update 1
 3. Unzip and make the .bin executatble: `chmod +x ERDAS_ECWJP2_SDK-5.4.0.bin`
@@ -28,7 +28,7 @@ Information on how to get ECW working with GDAL is all over the place. This reso
 
 With slight adaptation, SDK 5.5 should work fine too.
 
-#Source
+# Source
 Files in src/ were taken from the .DEB: https://launchpad.net/~ubuntugis/+archive/ubuntugis-unstable/+files/libgdal-ecw-src_1.10.0-1~precise4_all.deb (uploaded by Jerome Villeneuve Larouche, 2013-08-21)
 Then, the following .CPP and .H files were updated from the official GDAL Github, master branch 2020-10-10:
 - ecwasyncreader.cpp
@@ -38,7 +38,7 @@ Then, the following .CPP and .H files were updated from the official GDAL Github
 - ecwsdk_headers.h
 - gdal_ecw.h
 
-#References
+# References
 These got me in the right direction:
 * http://giswerk.org/doku.php?id=tutorials:softgis:xubuntu:technotes:ecwgdal
 * https://adamogrady.id.au/ops/ecw-gdal-ubuntu/
