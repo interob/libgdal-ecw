@@ -2,7 +2,7 @@
 
 Information on how to get ECW working with GDAL is all over the place. This resource aims to provide you with concise instructions to get ECW going through a simple GDAL plugin rather than compiling the entire GDAL library from source --with-ecw.
 
-# Intructions
+# Instructions
 
 ## Ubuntu 20.04
 1. Install GDAL; the below outlined procedure worked well with GDAL 3.1.3 installed from UbuntuGIS-unstable PPA (`sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable`)
@@ -50,3 +50,7 @@ Also, be informed about the new ABI:
 * Even Rouault helpful response in [gdal-dev]: https://lists.osgeo.org/pipermail/gdal-dev/2018-May/048478.html
 
 Apparently, since version 4.5 (update 1?) the SDK includes binaries follwing the new C++11 ABI convention
+
+# Build GDAL from source with ECW support
+
+Would rather like to build GDAL from source? Check this post (SDK 5.5, minding the C++11 ABI): https://blog.geomaster.pt/compiling-gdal-with-geopdf-support/
