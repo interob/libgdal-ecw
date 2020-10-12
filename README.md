@@ -13,7 +13,7 @@ Information on how to get ECW working with GDAL is all over the place. This reso
 6. `sudo ln -s  /usr/local/ERDAS-ECW_JPEG_2000_SDK-5.4.0/Desktop_Read-Only/lib/newabi/x64/release/libNCSEcw.so /usr/local/lib/libNCSEcw.so`
 7. `sudo ln -s /usr/local/ERDAS-ECW_JPEG_2000_SDK-5.4.0/Desktop_Read-Only/lib/newabi/x64/release/libNCSEcw.so.5.4.0 /usr/local/lib/libNCSEcw.so.5.4.0`
 8. `sudo ldconfig`
-9. Make sure the GDAL plugins directory exists; e.g. /usr/lib/gdalplugins
+9. Make sure the GDAL plugins directory exists; e.g. `/usr/lib/gdalplugins` (used below) or `/usr/local/lib/gdalplugins`
 10. clone this git repository
 11. Create a sibling directory to build the plugin: `mkdir libgdal-ecw-build`
 12. `cp libgdal-ecw/src/* libgdal-ecw-build`
