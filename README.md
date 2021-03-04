@@ -6,7 +6,7 @@ Information on how to get ECW working with GDAL is all over the place. This reso
 
 ## Ubuntu 20.04
 1. Install GDAL; the below outlined procedure worked well with GDAL 3.1.3 installed from UbuntuGIS-unstable PPA (`sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable`)
-2. Download the ERDAS ECW SDK; this guide is based on 5.4 update 1
+2. Download the ERDAS ECW SDK; this guide is based on 5.4 update 1 (http://download.hexagongeospatial.com/downloads/ecw/erdas-ecw-jp2-sdk-v54-update-1-for-linux)
 3. Unzip and make the .bin executatble: `chmod +x ERDAS_ECWJP2_SDK-5.4.0.bin`
 4. `./ERDAS_ECWJP2_SDK-5.4.0.bin`
 5. `sudo cp -r hexagon/ERDAS-ECW_JPEG_2000_SDK-5.4.0 /usr/local`
