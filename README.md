@@ -24,9 +24,12 @@ Information on how to get ECW working with GDAL is all over the place. This reso
 17. `sudo make install`
 18. `sudo ldconfig`
 19. Now test: `gdalinfo --formats | grep -i ECW`
-20. You may need to to tell GDAL where your plugins live: `export GDAL_DRIVER_PATH=/usr/lib/gdalplugins`
 
 With slight adaptation, SDK 5.5 should work fine too.
+
+# Troubleshooting
+1. You may need to to tell GDAL where your plugins live: `export GDAL_DRIVER_PATH=/usr/lib/gdalplugins`
+2. For use in python you may need to preload libgdal, e.g.: `export LD_PRELOAD=/usr/lib/libgdal.so.27.0.3`
 
 # Source
 Files in src/ were taken from the .DEB: https://launchpad.net/~ubuntugis/+archive/ubuntugis-unstable/+files/libgdal-ecw-src_1.10.0-1~precise4_all.deb (uploaded by Jerome Villeneuve Larouche, 2013-08-21)
