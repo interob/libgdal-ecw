@@ -7,7 +7,7 @@ This approach is tested on Manjaro using the repo-maintained GDAL package (Offic
 # Instructions
 
 ## Ubuntu 20.04
-1. Install GDAL; the below outlined procedure worked well with GDAL 3.1.3 installed from UbuntuGIS-unstable PPA (`sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable`)
+1. Install a repo-maintained GDAL. The next steps outlined below worked well with GDAL 3.1.3 installed from UbuntuGIS-unstable PPA (`sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable`) as well as with GDAL 3.7.0 under Manjaro installed from their Official Repository, extra.
 2. Download the ERDAS ECW SDK; this guide is based on 5.4 update 1 (http://download.hexagongeospatial.com/downloads/ecw/erdas-ecw-jp2-sdk-v54-update-1-for-linux)
 3. Unzip and make the .bin executatble: `chmod +x ERDAS_ECWJP2_SDK-5.4.0.bin`
 4. `./ERDAS_ECWJP2_SDK-5.4.0.bin`
@@ -28,7 +28,7 @@ This approach is tested on Manjaro using the repo-maintained GDAL package (Offic
 19. `sudo ldconfig`
 20. Now test: `gdalinfo --formats | grep -i ECW`
 
-With slight adaptation, SDK 5.5 should work fine too.
+With slight adaptation, SDK 5.5 should work fine too. Be aware the you will need to re-do steps 10-20 as you update the GDAL package you have installed in your system.
 
 # Troubleshooting
 1. You may need to to tell GDAL where your plugins live: `export GDAL_DRIVER_PATH=/usr/lib/gdalplugins`
