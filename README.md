@@ -47,6 +47,7 @@ Then, the following .cpp and .h files were updated from the official GDAL Github
 
 # References
 These got me in the right direction:
+* https://github.com/OSGeo/gdal/blob/master/MIGRATION_GUIDE.TXT
 * http://giswerk.org/doku.php?id=tutorials:softgis:xubuntu:technotes:ecwgdal
 * https://adamogrady.id.au/ops/ecw-gdal-ubuntu/
 * https://gis.stackexchange.com/questions/94870/unable-to-install-ecw-support-on-lubuntu-14-04
