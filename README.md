@@ -18,12 +18,13 @@ Information on how to get ECW working with GDAL is all over the place. This reso
 11. Create a sibling directory to build the plugin: `mkdir libgdal-ecw-build`
 12. `cp libgdal-ecw/src/* libgdal-ecw-build`
 13. `cd libgdal-ecw-build`
-14. `sh ./configure --with-ecw=/usr/local/ERDAS-ECW_JPEG_2000_SDK-5.4.0/Desktop_Read-Only --with-autoload=/usr/lib/gdalplugins`
-15. `make`
-16. `make plugin`
-17. `sudo make install`
-18. `sudo ldconfig`
-19. Now test: `gdalinfo --formats | grep -i ECW`
+14. `autoreconf --force --install -v`
+15. `sh ./configure --with-ecw=/usr/local/ERDAS-ECW_JPEG_2000_SDK-5.4.0/Desktop_Read-Only --with-autoload=/usr/lib/gdalplugins`
+16. `make`
+17. `make plugin`
+18. `sudo make install`
+19. `sudo ldconfig`
+20. Now test: `gdalinfo --formats | grep -i ECW`
 
 With slight adaptation, SDK 5.5 should work fine too.
 
