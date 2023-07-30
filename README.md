@@ -2,6 +2,8 @@
 
 Information on how to get ECW working with GDAL is all over the place. This resource aims to provide you with concise instructions to get ECW going through a simple GDAL plugin rather than compiling the entire GDAL library from source --with-ecw.
 
+This approach is tested on Manjaro using the repo-maintained GDAL package (Official Repository, extra); works like a charm in QGIS (also installed from Official Repository, extra).
+
 # Instructions
 
 ## Ubuntu 20.04
